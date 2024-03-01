@@ -14,6 +14,26 @@ import (
 var todoFileName = ".todo.json"
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
+		fmt.Fprintf(flag.CommandLine.Output(), "\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  Adding a new task:\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  %s -add your task description here\n", os.Args[0])
+		fmt.Fprintf(flag.CommandLine.Output(), "\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  Listing tasks:\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  %s -list\n", os.Args[0])
+		fmt.Fprintf(flag.CommandLine.Output(), "\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  Completing a task:\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  %s -complete 1\n", os.Args[0])
+		fmt.Fprintf(flag.CommandLine.Output(), "\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  Removing a task:\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "  %s -remove 1\n", os.Args[0])
+	}
+
 	add := flag.Bool("add", false, "Add task to the todo list")
 	list := flag.Bool("list", false, "List all tasks")
 	complete := flag.Int("complete", 0, "Item to be completed")
