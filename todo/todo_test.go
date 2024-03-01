@@ -66,3 +66,34 @@ func TestDelete(t *testing.T) {
 		t.Errorf("Expected %q, got %q instead.", tasks[2], l[1].Task)
 	}
 }
+
+func TestSaveGet(t *testing.T) {
+	l1 := todo.List{}
+	l2 := todo.List{}
+
+	taskName := "New Task"
+	l1.Add(taskName)
+
+	if l1[0].Task != taskName {
+		t.Errorf("Expected %q, got %q instead.", taskName, l1[0].Task)
+	}
+
+	tf, err := os.CreateTemp("", "todo")
+	if err != nil {
+		t.Fatalf("Error creating temp file: %s", err)
+	}
+
+	defer os.Remove(tf.Name())
+
+	if err := l1.Save(tf.Name()); err != nil {
+		t.Fatalf("Error saving list: %s", err)
+	}
+
+	if err := l2.Get(tf.Name()); err != nil {
+		t.Fatalf("Error getting list from file: %s", err)
+	}
+
+	if l1[0].Task != l2[0].Task {
+		t.Errorf("Task %q should match %q task.", l1[0].Task, l2[0].Task)
+	}
+}
