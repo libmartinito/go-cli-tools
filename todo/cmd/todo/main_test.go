@@ -97,7 +97,7 @@ func TestTodoCLI(t *testing.T) {
 		}
 	})
 
-	t.Run("ListTasks", func(t *testing.T) {
+	t.Run("ListTasksAfterDeleting", func(t *testing.T) {
 		cmd := exec.Command(cmdPath, "-list")
 		out, err := cmd.CombinedOutput()
 		if err != nil {
@@ -124,6 +124,42 @@ func TestTodoCLI(t *testing.T) {
 
 		if !strings.Contains(string(out), task2) {
 			t.Errorf("Expected output to contain %q, got %q instead.", task2, string(out))
+		}
+	})
+
+	t.Run("CompleteTask", func(t *testing.T) {
+		cmd := exec.Command(cmdPath, "-complete", "1")
+
+		if err := cmd.Run(); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	t.Run("ListTasksAfterCompleting", func(t *testing.T) {
+		cmd := exec.Command(cmdPath, "-list")
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		expected := fmt.Sprintf("X 1: %s\n", task2)
+
+		if expected != string(out) {
+			t.Errorf("Expected %q, got %q instead.", expected, string(out))
+		}
+	})
+
+	t.Run("ListTasksWithCompletedHidden", func(t *testing.T) {
+		cmd := exec.Command(cmdPath, "-hide-completed", "-list")
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		expected := ""
+
+		if expected != string(out) {
+			t.Errorf("Expected %q, got %q instead.", expected, string(out))
 		}
 	})
 }

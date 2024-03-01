@@ -16,8 +16,9 @@ type item struct {
 }
 
 type List struct {
-	Items   []item
-	Verbose bool
+	Items         []item
+	Verbose       bool
+	HideCompleted bool
 }
 
 func (l *List) Add(task string) {
@@ -83,6 +84,10 @@ func (l *List) String() string {
 
 	for k, t := range l.Items {
 		prefix := "  "
+
+		if l.HideCompleted && t.Done {
+			continue
+		}
 
 		if t.Done {
 			prefix = "X "
