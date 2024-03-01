@@ -15,7 +15,10 @@ type item struct {
 	CompletedAt time.Time
 }
 
-type List []item
+type List struct {
+	Items   []item
+	Verbose bool
+}
 
 func (l *List) Add(task string) {
 	t := item{
@@ -25,36 +28,32 @@ func (l *List) Add(task string) {
 		CompletedAt: time.Time{},
 	}
 
-	*l = append(*l, t)
+	l.Items = append(l.Items, t)
 }
 
 func (l *List) Complete(i int) error {
-	ls := *l
-
-	if i <= 0 || i > len(ls) {
+	if i <= 0 || i > len(l.Items) {
 		return fmt.Errorf("Item %d does not exist", i)
 	}
 
-	ls[i-1].Done = true
-	ls[i-1].CompletedAt = time.Now()
+	l.Items[i-1].Done = true
+	l.Items[i-1].CompletedAt = time.Now()
 
 	return nil
 }
 
 func (l *List) Delete(i int) error {
-	ls := *l
-
-	if i <= 0 || i > len(ls) {
+	if i <= 0 || i > len(l.Items) {
 		return fmt.Errorf("Item %d does not exist", i)
 	}
 
-	*l = append(ls[:i-1], ls[i:]...)
+	l.Items = append(l.Items[:i-1], l.Items[i:]...)
 
 	return nil
 }
 
 func (l *List) Save(filename string) error {
-	js, err := json.Marshal(l)
+	js, err := json.Marshal(l.Items)
 	if err != nil {
 		return err
 	}
@@ -76,20 +75,32 @@ func (l *List) Get(filename string) error {
 		return nil
 	}
 
-	return json.Unmarshal(file, l)
+	return json.Unmarshal(file, &l.Items)
 }
 
 func (l *List) String() string {
 	formatted := ""
 
-	for k, t := range *l {
+	for k, t := range l.Items {
 		prefix := "  "
 
 		if t.Done {
 			prefix = "X "
 		}
 
-		formatted += fmt.Sprintf("%s%d: %s\n", prefix, k+1, t.Task)
+		formatted += fmt.Sprintf("%s%d: %s", prefix, k+1, t.Task)
+
+		if l.Verbose && t.Done {
+			formatted += fmt.Sprintf("  Completed: %v\n", t.CompletedAt.Format("2006-01-02 15:04:05"))
+		}
+
+		if l.Verbose {
+			formatted += fmt.Sprintf("  Created: %v\n", t.CreatedAt.Format("2006-01-02 15:04:05"))
+		}
+
+		if !l.Verbose {
+			formatted += "\n"
+		}
 	}
 
 	return formatted

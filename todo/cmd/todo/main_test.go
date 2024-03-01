@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -110,4 +111,19 @@ func TestTodoCLI(t *testing.T) {
 		}
 	})
 
+	t.Run("ListVerboseTasks", func(t *testing.T) {
+		cmd := exec.Command(cmdPath, "-verbose", "-list")
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if !strings.Contains(string(out), "Created:") {
+			t.Errorf("Expected output to contain 'Created:', got %q instead.", string(out))
+		}
+
+		if !strings.Contains(string(out), task2) {
+			t.Errorf("Expected output to contain %q, got %q instead.", task2, string(out))
+		}
+	})
 }
