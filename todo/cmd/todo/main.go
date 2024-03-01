@@ -8,7 +8,7 @@ import (
 	"github.com/libmartinito/go-cli-tools/todo"
 )
 
-const todoFileName = ".todo.json"
+var todoFileName = ".todo.json"
 
 func main() {
 	task := flag.String("task", "", "Task to be included in the todo list")
@@ -16,6 +16,10 @@ func main() {
 	complete := flag.Int("complete", 0, "Item to be completed")
 
 	flag.Parse()
+
+	if os.Getenv("TODO_FILENAME") != "" {
+		todoFileName = os.Getenv("TODO_FILENAME")
+	}
 
 	l := &todo.List{}
 
