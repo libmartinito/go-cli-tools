@@ -166,4 +166,38 @@ func TestTodoCLI(t *testing.T) {
 			t.Errorf("Expected %q, got %q instead.", expected, string(out))
 		}
 	})
+
+	tasks := "test task 3\ntest task 4"
+	t.Run("AddNewTasksFromMultilineSTDIN", func(t *testing.T) {
+		cmd := exec.Command(cmdPath, "-add")
+		cmdStdIn, err := cmd.StdinPipe()
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		io.WriteString(cmdStdIn, tasks)
+		cmdStdIn.Close()
+
+		if err := cmd.Run(); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	t.Run("ListTasksAfterMultilineSTDINInput", func(t *testing.T) {
+		cmd := exec.Command(cmdPath, "-list")
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		tasksArr := strings.Split(tasks, "\n")
+
+		expected := fmt.Sprintf("X 1: %s\n  2: %s\n  3: %s\n", task2, tasksArr[0], tasksArr[1])
+
+		if expected != string(out) {
+			t.Errorf("Expected %q, got %q instead.", expected, string(out))
+		}
+	})
+
 }
