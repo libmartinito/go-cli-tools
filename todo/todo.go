@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 )
@@ -52,4 +51,13 @@ func (l *List) Delete(i int) error {
 	*l = append(ls[:i-1], ls[i:]...)
 
 	return nil
+}
+
+func (l *List) Save(filename string) error {
+	js, err := json.Marshal(l)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(filename, js, 0644)
 }
